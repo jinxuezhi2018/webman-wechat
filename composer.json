@@ -1,6 +1,6 @@
 {
-    "name": "xuezhitech/webman-aliyun-sms",
-    "description": "aliyun sms package for webman",
+    "name": "xuezhitech/webman-wechat",
+    "description": "wechat for webman",
     "authors": [
         {
             "name": "jinxuezhi",
@@ -10,11 +10,11 @@
     "license": "Apache-2.0",
     "require": {
       "workerman/webman-framework": "^2.1",
-      "webman/think-cache": "^2.1"
+      "guzzlehttp/guzzle": "^7.0"
     },
     "autoload": {
         "psr-4": {
-            "xuezhitech\\aliyunsms\\": "src/"
+            "xuezhitech\\wechat\\": "src/"
         }
     }
 }
