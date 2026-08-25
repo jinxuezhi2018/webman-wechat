@@ -4,6 +4,7 @@ namespace xuezhitech\wechat\Auth;
 
 use GuzzleHttp\Client;
 use xuezhitech\wechat\Exception\WeChatException;
+use xuezhitech\wechat\Util\Helper;
 
 /**
  * 小程序登录凭证校验（auth.code2Session）
@@ -63,26 +64,17 @@ class Code2Session
      */
     public function handle(string $code): array
     {
-        $appId = $this->config['app_id'] ?? '';
-        $appSecret = $this->config['app_secret'] ?? '';
-
-        if (empty($appId)) {
-            throw new WeChatException('app_id 配置不能为空');
-        }
-
-        if (empty($appSecret)) {
-            throw new WeChatException('app_secret 配置不能为空');
-        }
-
-        if (empty($code)) {
-            throw new WeChatException('code 不能为空');
-        }
+        Helper::checkNotEmpty([
+            'app_id' => $this->config['app_id'] ?? '',
+            'app_secret' => $this->config['app_secret'] ?? '',
+            'code' => $code,
+        ]);
 
         try {
             $response = $this->client->get(self::CODE2SESSION_PATH, [
                 'query' => [
-                    'appid' => $appId,
-                    'secret' => $appSecret,
+                    'appid' => $this->config['app_id'],
+                    'secret' => $this->config['app_secret'],
                     'js_code' => $code,
                     'grant_type' => 'authorization_code',
                 ],

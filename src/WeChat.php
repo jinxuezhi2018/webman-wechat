@@ -3,6 +3,7 @@
 namespace xuezhitech\wechat;
 
 use xuezhitech\wechat\Auth\Code2Session;
+use xuezhitech\wechat\Phone\GetPhoneNumber;
 
 /**
  * 微信 SDK 主类
@@ -13,6 +14,7 @@ use xuezhitech\wechat\Auth\Code2Session;
  *     'app_secret' => 'your_app_secret',
  * ]);
  * $result = $wechat->auth->code2Session($code);
+ * $phoneInfo = $wechat->phone->handle($code);
  */
 class WeChat
 {
@@ -27,6 +29,11 @@ class WeChat
     public Code2Session $auth;
 
     /**
+     * @var GetPhoneNumber
+     */
+    public GetPhoneNumber $phone;
+
+    /**
      * @param array $config 配置数组
      * @param string $config['app_id'] 小程序 appId
      * @param string $config['app_secret'] 小程序 appSecret
@@ -35,6 +42,7 @@ class WeChat
     {
         $this->config = $config;
         $this->auth = new Code2Session($config);
+        $this->phone = new GetPhoneNumber($this);
     }
 
     /**

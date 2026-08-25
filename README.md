@@ -11,6 +11,7 @@ composer require xuezhitech/webman-wechat
 ## 功能
 
 - [x] 小程序登录凭证校验（auth.code2Session）
+- [x] 小程序获取手机号（phone.getPhoneNumber）
 
 ## 使用方式
 
@@ -127,6 +128,87 @@ try {
 | 40029   | code 无效 |
 | 45011   | 频率限制，每个用户每分钟 100 次 |
 | 40226   | 高风险等级用户，小程序登录拦截 |
+
+### 4. phone.getPhoneNumber 说明
+
+该接口用于小程序获取手机号，对应微信官方接口：
+
+```
+POST https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=ACCESS_TOKEN
+```
+
+**前置条件：**
+
+前端需通过 `<button open-type="getPhoneNumber">` 组件触发用户授权，在回调事件中获取 `code`。
+
+**调用方式：**
+
+```php
+$phoneInfo = $wechat->phone->handle($code);
+```
+
+**返回结果：**
+
+```php
+[
+    'phoneNumber'     => 'xxxxxx',  // 用户绑定的手机号（国家码和手机号间无分隔符）
+    'purePhoneNumber' => 'xxxxxx',  // 纯 11 位手机号码
+    'countryCode'     => '86',      // 国际区号
+    'watermark'       => [          // 数据水印
+        'appid'     => 'xxxxxx',
+        'timestamp' => 1637744274,
+    ],
+]
+```
+
+**错误处理：**
+
+失败时抛出 `WeChatException`，可通过以下方法获取错误信息：
+
+```php
+try {
+    $phoneInfo = $wechat->phone->handle($code);
+} catch (WeChatException $e) {
+    $e->getWechatErrCode(); // 微信错误码
+    $e->getWechatErrMsg();  // 微信错误信息
+    $e->getMessage();       // 完整错误描述
+}
+```
+
+**常见错误码：**
+
+| errcode | 说明 |
+|---------|------|
+| 0       | 请求成功 |
+| 40029   | code 无效 |
+| 40013   | 非法 AppID |
+| 40001   | access_token 无效 |
+| 40014   | access_token 过期 |
+
+**在 webman 控制器中使用示例：**
+
+```php
+public function getPhoneNumber(Request $request)
+{
+    $code = $request->input('code');
+
+    $config = config('plugin.xuezhitech.wechat.wechat');
+    $wechat = new WeChat($config);
+
+    try {
+        $phoneInfo = $wechat->phone->handle($code);
+        return json([
+            'code' => 0,
+            'data' => $phoneInfo,
+        ]);
+    } catch (WeChatException $e) {
+        return json([
+            'code'    => $e->getWechatErrCode(),
+            'message' => $e->getWechatErrMsg(),
+        ]);
+    }
+}
+```
 
 ## License
 
