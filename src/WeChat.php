@@ -4,6 +4,7 @@ namespace xuezhitech\wechat;
 
 use xuezhitech\wechat\Auth\Code2Session;
 use xuezhitech\wechat\Phone\GetPhoneNumber;
+use xuezhitech\wechat\UnlimitedQRCode\getUnlimitedQRCode;
 
 /**
  * 微信 SDK 主类
@@ -15,6 +16,7 @@ use xuezhitech\wechat\Phone\GetPhoneNumber;
  * ]);
  * $result = $wechat->auth->code2Session($code);
  * $phoneInfo = $wechat->phone->handle($code);
+ * $qrCodeBuffer = $wechat->unlimitedQRCode->handle('a=1&b=2');
  */
 class WeChat
 {
@@ -34,6 +36,11 @@ class WeChat
     public GetPhoneNumber $phone;
 
     /**
+     * @var getUnlimitedQRCode
+     */
+    public getUnlimitedQRCode $unlimitedQRCode;
+
+    /**
      * @param array $config 配置数组
      * @param string $config['app_id'] 小程序 appId
      * @param string $config['app_secret'] 小程序 appSecret
@@ -41,8 +48,9 @@ class WeChat
     public function __construct(array $config)
     {
         $this->config = $config;
-        $this->auth = new Code2Session($config);
+        $this->auth = new Code2Session($this);
         $this->phone = new GetPhoneNumber($this);
+        $this->unlimitedQRCode = new getUnlimitedQRCode($this);
     }
 
     /**

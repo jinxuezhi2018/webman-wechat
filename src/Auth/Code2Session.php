@@ -3,8 +3,10 @@
 namespace xuezhitech\wechat\Auth;
 
 use GuzzleHttp\Client;
+use xuezhitech\wechat\Constant\ApiUrl;
 use xuezhitech\wechat\Exception\WeChatException;
 use xuezhitech\wechat\Util\Helper;
+use xuezhitech\wechat\WeChat;
 
 /**
  * 小程序登录凭证校验（auth.code2Session）
@@ -16,19 +18,14 @@ use xuezhitech\wechat\Util\Helper;
 class Code2Session
 {
     /**
-     * 微信 API 基础地址
-     */
-    const BASE_URL = 'https://api.weixin.qq.com';
-
-    /**
      * code2Session 接口路径
      */
     const CODE2SESSION_PATH = '/sns/jscode2session';
 
     /**
-     * @var array 配置信息
+     * @var WeChat SDK 主实例
      */
-    protected array $config;
+    protected WeChat $wechat;
 
     /**
      * @var Client HTTP 客户端
@@ -36,15 +33,14 @@ class Code2Session
     protected Client $client;
 
     /**
-     * @param array $config 配置数组
-     * @param string $config['app_id'] 小程序 appId
-     * @param string $config['app_secret'] 小程序 appSecret
+     * @param WeChat $wechat SDK 主实例
      */
-    public function __construct(array $config)
+    public function __construct(WeChat $wechat)
     {
-        $this->config = $config;
+        $this->wechat = $wechat;
+        $config = $wechat->getConfig();
         $this->client = new Client([
-            'base_uri' => self::BASE_URL,
+            'base_uri' => ApiUrl::BASE_URL,
             'timeout' => $config['timeout'] ?? 5.0,
             'verify' => $config['verify_ssl'] ?? true,
         ]);
@@ -64,17 +60,19 @@ class Code2Session
      */
     public function handle(string $code): array
     {
+        $config = $this->wechat->getConfig();
+
         Helper::checkNotEmpty([
-            'app_id' => $this->config['app_id'] ?? '',
-            'app_secret' => $this->config['app_secret'] ?? '',
+            'app_id' => $config['app_id'] ?? '',
+            'app_secret' => $config['app_secret'] ?? '',
             'code' => $code,
         ]);
 
         try {
             $response = $this->client->get(self::CODE2SESSION_PATH, [
                 'query' => [
-                    'appid' => $this->config['app_id'],
-                    'secret' => $this->config['app_secret'],
+                    'appid' => $config['app_id'],
+                    'secret' => $config['app_secret'],
                     'js_code' => $code,
                     'grant_type' => 'authorization_code',
                 ],

@@ -3,6 +3,7 @@
 namespace xuezhitech\wechat\Phone;
 
 use GuzzleHttp\Client;
+use xuezhitech\wechat\Constant\ApiUrl;
 use xuezhitech\wechat\Exception\WeChatException;
 use xuezhitech\wechat\Util\Helper;
 use xuezhitech\wechat\WeChat;
@@ -17,11 +18,6 @@ use xuezhitech\wechat\WeChat;
  */
 class GetPhoneNumber
 {
-    /**
-     * 微信 API 基础地址
-     */
-    const BASE_URL = 'https://api.weixin.qq.com';
-
     /**
      * 获取手机号接口路径
      */
@@ -45,7 +41,7 @@ class GetPhoneNumber
         $this->wechat = $wechat;
         $config = $wechat->getConfig();
         $this->client = new Client([
-            'base_uri' => self::BASE_URL,
+            'base_uri' => ApiUrl::BASE_URL,
             'timeout' => $config['timeout'] ?? 5.0,
             'verify' => $config['verify_ssl'] ?? true,
         ]);
